@@ -2,11 +2,11 @@
 #include <DHT11.h>
 DHT11 dht11(2);
 
-//sensores coliflor
+//sensores de la coliflor
 int sensor1c = A0;
 int sensor2c = A1;
 
-//sensores maiz
+//sensores del maiz
 int sensor1m = A2;
 int sensor2m = A3;
 
