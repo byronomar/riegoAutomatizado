@@ -1,7 +1,7 @@
 import serial                      #comunicación serial con arduino
 import time                        #retardos de tiempo
 import json                        #formato de envio y recepcion de datos
-import paho.mqtt.client as mqtt    #libreria mqtt
+import paho.mqtt.client as mqtt    #librería mqtt
 from urllib.request import urlopen
 
 def wait_for_internet_connection():
