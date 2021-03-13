@@ -41,13 +41,14 @@ class Login extends React.Component {
       .doSignInWithEmailAndPassword(email, password)
       .then((result) => {
         if(result){
+          this.props.history.push(ROUTES.HOME);
          if(!result.user.emailVerified){
           this.props.doSendEmailVerification();
          }
           toast.info('Bienvenido', {
             position: 'top-right'
           });  
-        this.props.history.push(ROUTES.HOME);
+        
 
         }else{
           toast.info('Email o contraseña incorrectos', {

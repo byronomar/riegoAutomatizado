@@ -2,7 +2,18 @@ import serial                      #comunicación serial con arduino
 import time                        #retardos de tiempo
 import json                        #formato de envio y recepcion de datos
 import paho.mqtt.client as mqtt    #libreria mqtt
+from urllib.request import urlopen
 
+def wait_for_internet_connection():
+    while True:
+        try:
+            response = urlopen("http://www.google.com/").read()
+            print("internet acces")
+            return
+        except Exception:
+            pass
+
+wait_for_internet_connection()
 
 #Conexión serial con arduino 
 ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
@@ -33,7 +44,7 @@ bd_riego_m = False
 
 #leer las configuraciones para el control de riego valores maximos y minimos de humedad de suelo
 try:
-    config_file = open("configuraciones.txt","r+")
+    config_file = open("/home/pi/Documents/riego/rpi/control_riego/configuraciones.txt","r+")
     config = config_file.readline()
     config_array = config.split(',')
     humedad_c_min = float(config_array[0])
@@ -59,7 +70,7 @@ def guardarConfiguraciones(configuraciones):
             
         str_configuraciones = str(humedad_c_min) + "," + str(humedad_c_max) + "," + str(humedad_m_min) + "," + str(humedad_m_max)
             
-        config_file = open("configuraciones.txt","w")
+        config_file = open("/home/pi/Documents/riego/rpi/control_riego/configuraciones.txt","w")
         config_file.write(str_configuraciones)
         config_file.close()
 
@@ -129,7 +140,7 @@ def leerMedidas ():
             temperatura_ambiente = float(medidas[6])
             humedad_ambiente = float(medidas[7])
 
-            #Ninvel de agua
+            #Nivel de agua
             nivel_agua = float(medidas[9])
 
     return 
@@ -169,6 +180,7 @@ Broker = "broker.emqx.io"
 sub_topic_inicio = "/SistemaRiego/MedidasRemotas/Inicio" 
 sub_topic_riego = "/SistemaRiego/MedidasRemotas/Riego"
 sub_topic_configuraciones = "/SistemaRiego/MedidasRemotas/Configuraciones"
+sub_topic_actualizar = "/SistemaRiego/MedidasRemotas/Actualizar"
 pub_topic = "/SistemaRiego/MedidasRemotas" 
 
 # Evento de conexión al bloquear MQTT
@@ -177,10 +189,11 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(sub_topic_inicio)
     client.subscribe(sub_topic_riego)
     client.subscribe(sub_topic_configuraciones)
+    client.subscribe(sub_topic_actualizar)
 
 # Evento de recepción de un nuevo mensaje MQTT
 def on_message(client, userdata, msg):
-    global sub_topic_inicio, sub_topic_riego, sub_topic_configuraciones
+    global sub_topic_inicio, sub_topic_riego, sub_topic_configuraciones, sub_topic_actualizar
 
     if msg.topic == sub_topic_inicio: 
         publicarVariables()
@@ -188,13 +201,21 @@ def on_message(client, userdata, msg):
     if msg.topic == sub_topic_riego: 
         if(msg.payload.decode("utf-8")  == "C"):
             riegoColiflor()
+            leerMedidas()
+            publicarVariables()
 
         if(msg.payload.decode("utf-8")  == "M"):
             riegoMaiz()
+            leerMedidas()
+            publicarVariables()
     
     if msg.topic == sub_topic_configuraciones:
         configuraciones = json.loads(msg.payload.decode("utf-8"))
         guardarConfiguraciones(configuraciones)
+    
+    #if msg.topic == sub_topic_actualizar:
+        #leerMedidas()
+       # publicarVariables()
 
 
 def on_publish(mosq, obj, mid):
@@ -206,7 +227,6 @@ client.on_connect = on_connect
 client.on_message = on_message
 client.connect(Broker, 1883, 60)
 client.loop_start()
-
 
 while True:
     try:
@@ -238,7 +258,7 @@ while True:
         leerMedidas()
         publicarVariables()
 
-        time.sleep(10)
+        time.sleep(60*5)
         
         
     except Exception as e:

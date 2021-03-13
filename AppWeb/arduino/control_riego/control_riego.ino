@@ -1,3 +1,4 @@
+
 #include <DHT11.h>
 DHT11 dht11(2);
 
@@ -5,7 +6,7 @@ DHT11 dht11(2);
 int sensor1c = A0;
 int sensor2c = A1;
 
-//sensores coliflor
+//sensores maiz
 int sensor1m = A2;
 int sensor2m = A3;
 
@@ -18,28 +19,23 @@ float humedad_m_ant = 0;
 float humedad_m = 0;
 
 //sensor de nivel de agua
-int trigger = 7;
-int echo = 8;
+int trigger = 8;
+int echo = 7;
 
 //CONTROL DE RIEGO
-int bomba_c1 = 3;
-int bomba_c2 = 4;
-int bomba_m1 = 5;
-int bomba_m2 = 6;
+int bomba_m = 5;
+int bomba_c = 6;
+int control_sensores = 3;
 
 void setup() {
  Serial.begin(9600);
  
  //SALIDAS DIGITALES
- pinMode(bomba_c1, OUTPUT);
- pinMode(bomba_c2, OUTPUT);
- pinMode(bomba_m1, OUTPUT);
- pinMode(bomba_m2, OUTPUT);
+ pinMode(bomba_c, OUTPUT);
+ pinMode(bomba_m, OUTPUT);
  
- digitalWrite(bomba_c1, LOW);
- digitalWrite(bomba_c2, LOW);
- digitalWrite(bomba_m1, LOW);
- digitalWrite(bomba_m2, LOW);
+ digitalWrite(bomba_c, LOW);
+ digitalWrite(bomba_m, LOW);
  
  //sensor de nivel de agua
  pinMode(trigger, OUTPUT);
@@ -56,6 +52,9 @@ void loop() {
     String comando = Serial.readStringUntil('.');
     if(comando == "lecturas"){
       
+      //encender sensores de humedad
+      digitalWrite(control_sensores, HIGH);
+      
       //medidas de humedad del suelo en coliflor
       float humedad1c = leerHumedad(sensor1c);
       float humedad2c = leerHumedad(sensor2c);
@@ -65,6 +64,10 @@ void loop() {
       float humedad1m = leerHumedad(sensor1m);
       float humedad2m = leerHumedad(sensor2m);
       humedad_m = (humedad1m + humedad2m)/2;
+      
+      //apagar sensores de humedad
+      digitalWrite(control_sensores, LOW);
+      
       
       //medidas de humedad ambiente y temperatura
       int err;
@@ -95,14 +98,14 @@ void loop() {
       Serial.println(nivel);
       
     }else if(comando == "riego_c"){
-      digitalWrite(bomba_c2, HIGH);
+      digitalWrite(bomba_c, HIGH);
       delay(200);
-      digitalWrite(bomba_c2, LOW);
+      digitalWrite(bomba_c, LOW);
       
     }else if(comando == "riego_m"){
-      digitalWrite(bomba_m2, HIGH);
+      digitalWrite(bomba_m, HIGH);
       delay(200);
-      digitalWrite(bomba_m2, LOW);
+      digitalWrite(bomba_m, LOW);
     }
     
   }

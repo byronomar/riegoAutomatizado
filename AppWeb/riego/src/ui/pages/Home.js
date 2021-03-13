@@ -50,8 +50,8 @@ class Home extends React.Component{
 
                 
 
-                <h3>Sistema de riego automático</h3>
-                  <img height="50px" alt = "logo" src= "https://firebasestorage.googleapis.com/v0/b/sistemadriego.appspot.com/o/logo.jpeg?alt=media&token=45838239-df94-4671-9e5c-2e2e8d32e4de"></img>
+                <h3>SISTEMA DE RIEGO AUTOMÁTICO</h3>
+                 <img height="55px" alt = "logo" src= "https://firebasestorage.googleapis.com/v0/b/sistemadriego.appspot.com/o/logo-UISRAEL.png?alt=media&token=8524a673-9e26-4cd2-855a-69aeda880d7d" ></img>
                   
                   
                 <MDBDropdown>
@@ -380,7 +380,7 @@ class SistemaRiego extends React.Component{
                             value = {this.state.configuraciones.humedad_m_max}
                             onChange = {this.handleChangeConfig}
                         />
-                      </MDBRow>
+                      </MDBRow> 
 
                       <MDBRow end>
                         <MDBBtn 
@@ -416,7 +416,7 @@ class SistemaRiego extends React.Component{
               Actualizar
             </MDBBtn>
 
-            <h3>Desarrollado por: Byron Gavilanez</h3>
+            <h3>Desarrollado por: Byron Gavilánez</h3>
 
             
           </main>
